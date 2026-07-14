@@ -1,0 +1,305 @@
+/* ===== テーマ配色（仕様書4章の値） ===== */
+:root,
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #222222;
+  --editor-bg: #fafafa;
+  --preview-bg: #ffffff;
+  --border: #dddddd;
+  --toolbar-bg: #f2f2f2;
+  --toc-bg: #f7f7f7;
+  --link: #0969da;
+  --code-bg: rgba(0, 0, 0, 0.05);
+
+  /* カスタマイズ可能な色（既定値。JSがlocalStorageの値で上書きする） */
+  --c-heading: #d9730d;
+  --c-list: #2f8f4e;
+  --c-quote: #8a8a8a;
+  --c-code: #a13fbf;
+  --c-table-border: #999999;
+}
+
+:root[data-theme="dark"] {
+  --bg: #1e1e1e;
+  --fg: #e0e0e0;
+  --editor-bg: #252526;
+  --preview-bg: #1e1e1e;
+  --border: #3c3c3c;
+  --toolbar-bg: #2d2d2d;
+  --toc-bg: #252526;
+  --link: #4ea1ff;
+  --code-bg: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== 全体レイアウト ===== */
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: "Noto Sans CJK JP", "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+}
+
+/* ===== ツールバー ===== */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+
+#toolbar .spacer { flex: 1 1 auto; }
+
+.tool-btn {
+  font: inherit;
+  font-size: 13px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tool-btn:hover { border-color: var(--c-heading); }
+
+#file-name {
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#dirty-mark {
+  color: #e05252;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ===== メイン3ペイン ===== */
+#main {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+#toc {
+  flex: 0 0 220px;
+  overflow-y: auto;
+  background: var(--toc-bg);
+  border-right: 1px solid var(--border);
+  padding: 8px 0;
+}
+#toc.hidden { display: none; }
+
+#toc-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-quote);
+  padding: 2px 12px 6px;
+}
+
+#toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#toc-list li {
+  font-size: 13px;
+  padding: 4px 12px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#toc-list li:hover { background: var(--code-bg); }
+#toc-list li.toc-empty-msg {
+  cursor: default;
+  color: var(--c-quote);
+}
+#toc-list li.toc-empty-msg:hover { background: none; }
+
+/* 見出しレベルに応じた字下げ */
+#toc-list li[data-level="2"] { padding-left: 26px; }
+#toc-list li[data-level="3"] { padding-left: 40px; }
+#toc-list li[data-level="4"] { padding-left: 54px; }
+#toc-list li[data-level="5"] { padding-left: 68px; }
+#toc-list li[data-level="6"] { padding-left: 82px; }
+
+/* 編集画面とプレビュー画面は左右半分ずつ */
+#editor-pane, #preview-pane {
+  flex: 1 1 50%;
+  min-width: 0;
+  min-height: 0;
+}
+
+#editor-pane {
+  border-right: 1px solid var(--border);
+  background: var(--editor-bg);
+}
+
+/* ===== CodeMirror（編集画面） ===== */
+#editor-pane .CodeMirror {
+  height: 100%;
+  font-family: "Noto Sans Mono CJK JP", Consolas, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: var(--editor-bg);
+  color: var(--fg);
+  padding: 4px 8px;
+}
+.CodeMirror-cursor { border-left-color: var(--fg); }
+.CodeMirror-selected { background: rgba(100, 149, 237, 0.25) !important; }
+
+/* 簡易シンタックスハイライト（行単位） */
+.cm-md-heading { color: var(--c-heading); font-weight: 700; }
+.cm-md-list    { color: var(--c-list); }
+.cm-md-quote   { color: var(--c-quote); font-style: italic; }
+.cm-md-code    { color: var(--c-code); }
+
+/* ===== プレビュー画面 ===== */
+#preview-pane {
+  overflow-y: auto;
+  position: relative; /* 見出しのoffsetTop計算の基準にする */
+  background: var(--preview-bg);
+}
+
+#preview {
+  padding: 16px 24px 60vh; /* 下部余白: 最後の見出しでも先頭にジャンプできるように */
+  max-width: 860px;
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+
+#preview h1, #preview h2, #preview h3,
+#preview h4, #preview h5, #preview h6 {
+  margin: 1.2em 0 0.5em;
+  line-height: 1.3;
+}
+#preview h1 { font-size: 1.7em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+#preview h2 { font-size: 1.4em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+#preview h3 { font-size: 1.2em; }
+
+#preview a { color: var(--link); }
+
+#preview img { max-width: 100%; }
+
+#preview blockquote {
+  margin: 0.8em 0;
+  padding: 0.2em 1em;
+  color: var(--c-quote);
+  border-left: 4px solid var(--border);
+}
+
+#preview code {
+  font-family: "Noto Sans Mono CJK JP", Consolas, Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+#preview pre {
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+}
+#preview pre code {
+  background: none;
+  padding: 0;
+}
+
+/* テーブル罫線（既定 #999999、カスタマイズ可能） */
+#preview table {
+  border-collapse: collapse;
+  margin: 0.8em 0;
+}
+#preview th, #preview td {
+  border: 1px solid var(--c-table-border);
+  padding: 5px 12px;
+}
+#preview th { background: var(--code-bg); }
+
+#preview hr {
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* ===== 設定モーダル ===== */
+#settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+#settings-overlay[hidden] { display: none; }
+
+#settings-panel {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  min-width: 300px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+#settings-panel h2 {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 6px 0;
+  font-size: 14px;
+}
+
+.setting-row input[type="color"] {
+  width: 48px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  padding: 1px;
+  cursor: pointer;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.settings-actions button {
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+.settings-actions button:hover { border-color: var(--c-heading); }

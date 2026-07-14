@@ -1,0 +1,25 @@
+{
+  "name": "Markdownエディタ",
+  "short_name": "MDエディタ",
+  "description": "軽量でシンプルなMarkdownエディタ。リアルタイムプレビュー・目次ジャンプ・色カスタマイズ対応。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f2f2f2",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "file_handlers": [
+    {
+      "action": "./",
+      "accept": {
+        "text/markdown": [".md", ".markdown"],
+        "text/plain": [".txt"]
+      }
+    }
+  ],
+  "launch_handler": { "client_mode": "focus-existing" }
+}

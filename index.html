@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdownエディタ</title>
+<meta name="theme-color" content="#f2f2f2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header id="toolbar">
+  <button id="btn-toc" class="tool-btn" title="目次の表示/非表示">☰ 目次</button>
+  <span id="file-name">無題.md</span>
+  <span id="dirty-mark" hidden title="未保存の変更があります">●</span>
+  <span class="spacer"></span>
+  <button id="btn-open" class="tool-btn" title="ファイルを開く (Ctrl+O)">開く</button>
+  <button id="btn-save" class="tool-btn" title="上書き保存 (Ctrl+S)">保存</button>
+  <button id="btn-save-as" class="tool-btn" title="名前を付けて保存 (Ctrl+Shift+S)">名前を付けて保存</button>
+  <button id="btn-settings" class="tool-btn" title="色の設定">⚙ 設定</button>
+  <button id="btn-theme" class="tool-btn" title="テーマ切替">🌙</button>
+</header>
+
+<main id="main">
+  <nav id="toc" aria-label="目次">
+    <div id="toc-title">目次</div>
+    <ul id="toc-list"></ul>
+  </nav>
+  <section id="editor-pane" aria-label="編集画面"></section>
+  <section id="preview-pane" aria-label="プレビュー画面">
+    <article id="preview"></article>
+  </section>
+</main>
+
+<div id="settings-overlay" hidden>
+  <div id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <h2 id="settings-title">色の設定</h2>
+    <div class="setting-row">
+      <label for="color-heading">見出しの色</label>
+      <input type="color" id="color-heading" data-color-key="heading">
+    </div>
+    <div class="setting-row">
+      <label for="color-list">リストの色</label>
+      <input type="color" id="color-list" data-color-key="list">
+    </div>
+    <div class="setting-row">
+      <label for="color-quote">引用の色</label>
+      <input type="color" id="color-quote" data-color-key="quote">
+    </div>
+    <div class="setting-row">
+      <label for="color-code">コードの色</label>
+      <input type="color" id="color-code" data-color-key="code">
+    </div>
+    <div class="setting-row">
+      <label for="color-table-border">表の罫線の色</label>
+      <input type="color" id="color-table-border" data-color-key="tableBorder">
+    </div>
+    <div class="settings-actions">
+      <button id="btn-reset-colors">既定の色に戻す</button>
+      <button id="btn-close-settings">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
+
+<script src="vendor/codemirror/codemirror.js"></script>
+<script src="vendor/markdown-it.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
