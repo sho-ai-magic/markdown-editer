@@ -62,17 +62,41 @@ body {
 #toolbar .spacer { flex: 1 1 auto; }
 
 .tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font: inherit;
   font-size: 13px;
-  padding: 4px 10px;
+  padding: 5px 10px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 7px;
   background: var(--bg);
   color: var(--fg);
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
-.tool-btn:hover { border-color: var(--c-heading); }
+.tool-btn:hover { background: var(--code-bg); border-color: var(--link); color: var(--link); }
+.tool-btn:active { background: var(--border); }
+.tool-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+
+/* ツールバー共通のアイコン（線画SVG、currentColorでテーマに追従） */
+.tool-btn .icon,
+.fmt-btn .icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* テーマ切替ボタン: 太陽/月の2アイコンをテーマ属性でCSS切り替え */
+:root[data-theme="light"] #btn-theme .icon-moon { display: none; }
+:root[data-theme="dark"] #btn-theme .icon-sun { display: none; }
 
 #file-name {
   font-size: 13px;
@@ -172,25 +196,33 @@ body {
 #format-toolbar .fmt-sep {
   width: 1px;
   align-self: stretch;
-  margin: 2px 4px;
+  margin: 4px 5px;
   background: var(--border);
+  opacity: 0.7;
 }
 
 .fmt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   font: inherit;
-  font-size: 13px;
-  min-width: 26px;
-  padding: 3px 6px;
+  font-size: 14px;
+  min-width: 30px;
+  height: 30px;
+  padding: 3px 8px;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: 6px;
   background: transparent;
   color: var(--fg);
   cursor: pointer;
   line-height: 1.4;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
-.fmt-btn:hover { background: var(--code-bg); border-color: var(--border); }
+.fmt-btn:hover { background: var(--code-bg); border-color: var(--border); color: var(--link); }
 .fmt-btn:active { background: var(--border); }
-.fmt-btn-text { font-size: 12px; white-space: nowrap; }
+.fmt-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+.fmt-btn-text { font-size: 12px; white-space: nowrap; padding: 3px 10px; }
 
 #char-count {
   font-size: 11px;

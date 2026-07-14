@@ -161,12 +161,14 @@ function updateCharCount(cm, el) {
   el.textContent = `${chars.toLocaleString()}文字 / 約${approxTokens.toLocaleString()}トークン`;
 }
 
+// ボタン内のラベル部分だけを一時的に差し替える（アイコンSVGは残す）
 function flashButton(btn, message) {
-  const original = btn.textContent;
+  const label = btn.querySelector(".btn-label") || btn;
+  const original = label.textContent;
   btn.disabled = true;
-  btn.textContent = message;
+  label.textContent = message;
   setTimeout(() => {
-    btn.textContent = original;
+    label.textContent = original;
     btn.disabled = false;
   }, 1200);
 }

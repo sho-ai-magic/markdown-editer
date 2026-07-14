@@ -83,8 +83,7 @@ export function initSettings({ overlayEl, panelEl, openBtn, closeBtn, resetBtn, 
 
   function applyTheme() {
     root.dataset.theme = theme;
-    // アイコンで現在の状態を示す: ライト=☀️ / ダーク=🌙
-    themeBtn.textContent = theme === "dark" ? "🌙" : "☀️";
+    // 太陽/月のアイコン表示切り替えはCSS側（[data-theme]セレクタ）で行う
     themeBtn.title = theme === "dark" ? "ライトモードに切替" : "ダークモードに切替";
   }
 

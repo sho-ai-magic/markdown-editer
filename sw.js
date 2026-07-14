@@ -1,6 +1,6 @@
 // オフライン動作用のService Worker。アプリ一式を事前キャッシュする。
 // アプリのファイルを更新したら CACHE_VERSION を上げること。
-const CACHE_VERSION = "mdeditor-v2";
+const CACHE_VERSION = "mdeditor-v3";
 
 const ASSETS = [
   "./",
