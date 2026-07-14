@@ -94,7 +94,7 @@ python3 -m http.server 8000
 
 ## Contributing
 
-Issues and pull requests are welcome — bug reports and feature requests included.
+Bug reports and feature requests are welcome via Issues. As this is a solo project without an established review process yet, I'm not accepting Pull Requests at this time.
 
 ## License
 
