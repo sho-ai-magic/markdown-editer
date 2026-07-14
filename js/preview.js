@@ -6,6 +6,37 @@ const md = window.markdownit({
   linkify: true,
 });
 
+// タスクリスト（- [ ] / - [x]）をチェックボックスとして描画する軽量拡張。
+// 外部プラグインは使わず、リスト項目のinlineトークンの先頭を見て変換する
+// （書式ツールバーのタスクリストボタンで挿入した記法に対応するため）。
+md.core.ruler.push("task_checkbox", (state) => {
+  const tokens = state.tokens;
+  for (let i = 0; i < tokens.length; i++) {
+    if (tokens[i].type !== "list_item_open") continue;
+    let inline = null;
+    for (let j = i + 1; j < tokens.length && tokens[j].type !== "list_item_close"; j++) {
+      if (tokens[j].type === "inline") {
+        inline = tokens[j];
+        break;
+      }
+    }
+    if (!inline) continue;
+    const match = /^\[([ xX])\]\s+/.exec(inline.content);
+    if (!match) continue;
+
+    const checked = match[1].toLowerCase() === "x";
+    inline.content = inline.content.slice(match[0].length);
+    if (inline.children[0] && inline.children[0].type === "text") {
+      inline.children[0].content = inline.children[0].content.replace(/^\[([ xX])\]\s+/, "");
+    }
+
+    tokens[i].attrSet("class", "task-list-item");
+    const checkbox = new state.Token("html_inline", "", 0);
+    checkbox.content = `<input type="checkbox" disabled${checked ? " checked" : ""}> `;
+    inline.children.unshift(checkbox);
+  }
+});
+
 // 見出しへの自動ID付与（同名見出しはカウンタで一意化）
 md.renderer.rules.heading_open = (tokens, idx, options, env, self) => {
   const inline = tokens[idx + 1];

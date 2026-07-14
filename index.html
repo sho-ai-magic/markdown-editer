@@ -28,7 +28,28 @@
     <div id="toc-title">目次</div>
     <ul id="toc-list"></ul>
   </nav>
-  <section id="editor-pane" aria-label="編集画面"></section>
+  <section id="editor-pane" aria-label="編集画面">
+    <div id="format-toolbar" role="toolbar" aria-label="書式ツールバー">
+      <button class="fmt-btn" data-fmt="bold" title="太字 (Ctrl+B)"><b>B</b></button>
+      <button class="fmt-btn" data-fmt="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
+      <button class="fmt-btn" data-fmt="strike" title="取り消し線"><s>S</s></button>
+      <button class="fmt-btn" data-fmt="heading" title="見出し（クリックでH1→H2→H3→解除と切り替え）">H</button>
+      <span class="fmt-sep"></span>
+      <button class="fmt-btn" data-fmt="ul" title="箇条書き">•</button>
+      <button class="fmt-btn" data-fmt="ol" title="番号付きリスト">1.</button>
+      <button class="fmt-btn" data-fmt="task" title="タスクリスト">☑</button>
+      <button class="fmt-btn" data-fmt="quote" title="引用">”</button>
+      <span class="fmt-sep"></span>
+      <button class="fmt-btn" data-fmt="code" title="コード">&lt;/&gt;</button>
+      <button class="fmt-btn" data-fmt="table" title="表を挿入">⊞</button>
+      <button class="fmt-btn" data-fmt="link" title="リンク">🔗</button>
+      <span class="spacer"></span>
+      <span id="char-count" title="文字数と、AIチャット等に貼り付ける際の目安トークン数（概算値）">0文字 / 約0トークン</span>
+      <button id="btn-copy-md" class="fmt-btn fmt-btn-text" title="Markdownソースをプレーンテキストとしてコピー">📋 コピー</button>
+      <button id="btn-copy-rich" class="fmt-btn fmt-btn-text" title="書式付き(リッチテキスト)でコピー。Googleドキュメント等に貼り付けると見出し・太字・表がそのまま反映されます">🌐 書式付き</button>
+    </div>
+    <div id="editor-host"></div>
+  </section>
   <section id="preview-pane" aria-label="プレビュー画面">
     <article id="preview"></article>
   </section>

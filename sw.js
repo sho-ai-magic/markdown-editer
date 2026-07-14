@@ -1,6 +1,6 @@
 // オフライン動作用のService Worker。アプリ一式を事前キャッシュする。
 // アプリのファイルを更新したら CACHE_VERSION を上げること。
-const CACHE_VERSION = "mdeditor-v1";
+const CACHE_VERSION = "mdeditor-v2";
 
 const ASSETS = [
   "./",
@@ -13,6 +13,7 @@ const ASSETS = [
   "./js/scrollsync.js",
   "./js/files.js",
   "./js/settings.js",
+  "./js/toolbar.js",
   "./vendor/codemirror/codemirror.js",
   "./vendor/codemirror/codemirror.css",
   "./vendor/markdown-it.min.js",

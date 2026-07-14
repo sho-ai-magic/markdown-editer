@@ -4,6 +4,7 @@ import { initToc } from "./toc.js";
 import { initScrollSync } from "./scrollsync.js";
 import { initFiles } from "./files.js";
 import { initSettings } from "./settings.js";
+import { initToolbar } from "./toolbar.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -18,7 +19,7 @@ initSettings({
 });
 
 // ---- エディタ・プレビュー ----
-const cm = createEditor($("editor-pane"));
+const cm = createEditor($("editor-host"));
 const previewPane = $("preview-pane");
 const previewEl = $("preview");
 
@@ -55,6 +56,16 @@ $("btn-open").addEventListener("click", () => files.openFile());
 $("btn-save").addEventListener("click", () => files.saveFile());
 $("btn-save-as").addEventListener("click", () => files.saveFileAs());
 
+// ---- 書式ツールバー（太字・斜体・見出し・リスト・引用・コード・表・リンク等） ----
+const toolbarActions = initToolbar({
+  cm,
+  toolbarEl: $("format-toolbar"),
+  charCountEl: $("char-count"),
+  copyMdBtn: $("btn-copy-md"),
+  copyRichBtn: $("btn-copy-rich"),
+  previewEl,
+});
+
 // キーボードショートカット
 window.addEventListener("keydown", (e) => {
   if (!(e.ctrlKey || e.metaKey)) return;
@@ -66,6 +77,12 @@ window.addEventListener("keydown", (e) => {
   } else if (key === "o") {
     e.preventDefault();
     files.openFile();
+  } else if (key === "b") {
+    e.preventDefault();
+    toolbarActions.bold();
+  } else if (key === "i") {
+    e.preventDefault();
+    toolbarActions.italic();
   }
 });
 
@@ -78,6 +95,7 @@ const WELCOME = `# Markdownエディタへようこそ
 
 - ツールバーの「開く」で \`.md\` ファイルを開けます（ウィンドウへのドラッグ&ドロップでもOK）
 - 「保存」で上書き保存、「名前を付けて保存」で新規保存します
+- 編集画面上部の書式ツールバーから、記法を覚えなくても太字・見出し・リストなどを挿入できます
 - ⚙ 設定から見出しやリストの色を変更できます
 - 🌙/☀️ ボタンでダークモードを切り替えられます
 
@@ -87,6 +105,9 @@ const WELCOME = `# Markdownエディタへようこそ
 
 1. 番号付きリスト
 2. 目次サイドバーの見出しをクリックするとジャンプできます
+
+- [x] タスクリストにも対応
+- [ ] 未完了のタスク
 
 | 機能 | 対応 |
 |---|---|
