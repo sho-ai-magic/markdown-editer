@@ -32,7 +32,22 @@ const toc = initToc({
   tocEl: $("toc"),
   tocListEl: $("toc-list"),
   toggleBtn: $("btn-toc"),
+  backdropEl: $("toc-backdrop"),
   scrollSync,
+});
+
+// ---- 編集/プレビュー切替タブ（モバイルのみ表示） ----
+const viewSwitchEl = $("view-switch");
+const mainEl = $("main");
+viewSwitchEl.querySelectorAll(".view-tab").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    mainEl.classList.toggle("mobile-preview", btn.dataset.view === "preview");
+    viewSwitchEl.querySelectorAll(".view-tab").forEach((b) => {
+      const active = b === btn;
+      b.classList.toggle("active", active);
+      b.setAttribute("aria-selected", active ? "true" : "false");
+    });
+  });
 });
 
 // リアルタイムプレビュー（200msデバウンス、仕様書3.2）

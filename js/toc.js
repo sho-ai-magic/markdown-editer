@@ -5,10 +5,21 @@
 //   座標を明示的に求めてスクロール位置を直接設定する
 // - smoothスクロールは環境により実行されないことがあるため、即時スクロール
 
-export function initToc({ cm, previewPane, previewEl, tocEl, tocListEl, toggleBtn, scrollSync }) {
-  toggleBtn.addEventListener("click", () => {
-    tocEl.classList.toggle("hidden");
-  });
+const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
+
+export function initToc({ cm, previewPane, previewEl, tocEl, tocListEl, toggleBtn, backdropEl, scrollSync }) {
+  // 目次の開閉。モバイルではオフキャンバスドロワー＋半透明の背景として扱う
+  // （.hiddenの意味はデスクトップ・モバイル共通で「現在表示されていない」）
+  function setOpen(open) {
+    tocEl.classList.toggle("hidden", !open);
+    if (backdropEl) backdropEl.classList.toggle("visible", open);
+  }
+
+  toggleBtn.addEventListener("click", () => setOpen(tocEl.classList.contains("hidden")));
+  if (backdropEl) backdropEl.addEventListener("click", () => setOpen(false));
+
+  // モバイルでは初期状態を閉じておく（デスクトップは従来通り開いた状態で起動）
+  if (isMobile()) setOpen(false);
 
   let headings = [];
 
@@ -30,6 +41,9 @@ export function initToc({ cm, previewPane, previewEl, tocEl, tocListEl, toggleBt
     if (el) previewPane.scrollTop = el.offsetTop;
 
     scrollSync.resume();
+
+    // モバイルではジャンプ後にドロワーを自動で閉じ、編集/プレビューが見えるようにする
+    if (isMobile()) setOpen(false);
   }
 
   function update(newHeadings) {

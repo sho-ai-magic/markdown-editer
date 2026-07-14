@@ -41,11 +41,23 @@
   </button>
 </header>
 
+<div id="view-switch" role="tablist" aria-label="表示切替">
+  <button class="view-tab active" data-view="editor" role="tab" aria-selected="true">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1z"/><path d="M14 7l3 3"/></svg>
+    編集
+  </button>
+  <button class="view-tab" data-view="preview" role="tab" aria-selected="false">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+    プレビュー
+  </button>
+</div>
+
 <main id="main">
   <nav id="toc" aria-label="目次">
     <div id="toc-title">目次</div>
     <ul id="toc-list"></ul>
   </nav>
+  <div id="toc-backdrop"></div>
   <section id="editor-pane" aria-label="編集画面">
     <div id="format-toolbar" role="toolbar" aria-label="書式ツールバー">
       <button class="fmt-btn" data-fmt="bold" title="太字 (Ctrl+B)"><b>B</b></button>
