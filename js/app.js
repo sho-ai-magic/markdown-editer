@@ -5,6 +5,7 @@ import { initScrollSync } from "./scrollsync.js";
 import { initFiles } from "./files.js";
 import { initSettings } from "./settings.js";
 import { initToolbar } from "./toolbar.js";
+import { initTabs } from "./tabs.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -59,18 +60,6 @@ function render() {
 const renderDebounced = debounce(render, 200);
 cm.on("change", renderDebounced);
 
-// ---- ファイル操作 ----
-const files = initFiles({
-  cm,
-  fileNameEl: $("file-name"),
-  dirtyMarkEl: $("dirty-mark"),
-  fileInputEl: $("file-input"),
-});
-
-$("btn-open").addEventListener("click", () => files.openFile());
-$("btn-save").addEventListener("click", () => files.saveFile());
-$("btn-save-as").addEventListener("click", () => files.saveFileAs());
-
 // ---- 書式ツールバー（太字・斜体・見出し・リスト・引用・コード・表・リンク等） ----
 const toolbarActions = initToolbar({
   cm,
@@ -80,6 +69,31 @@ const toolbarActions = initToolbar({
   copyRichBtn: $("btn-copy-rich"),
   previewEl,
 });
+
+// ---- タブ（複数ファイルの同時編集） ----
+// swapDoc()はchangeイベントを発火しないため、タブ切替のたびに
+// プレビュー・目次・文字数カウンター・スクロール位置を明示的に更新し直す。
+const tabs = initTabs({
+  cm,
+  tabBarEl: $("tab-bar"),
+  newTabBtn: $("btn-new-tab"),
+  onActivate: () => {
+    render();
+    toolbarActions.refreshCharCount();
+    scrollSync.syncNow();
+  },
+});
+
+// ---- ファイル操作 ----
+const files = initFiles({
+  cm,
+  tabs,
+  fileInputEl: $("file-input"),
+});
+
+$("btn-open").addEventListener("click", () => files.openFile());
+$("btn-save").addEventListener("click", () => files.saveFile());
+$("btn-save-as").addEventListener("click", () => files.saveFileAs());
 
 // キーボードショートカット
 window.addEventListener("keydown", (e) => {
@@ -136,8 +150,7 @@ const WELCOME = `# Markdownエディタへようこそ
 [リンクの例](https://example.com)
 `;
 
-files.setContent(WELCOME, "無題.md", null);
-render();
+tabs.openInNewTab(WELCOME, "無題.md", null);
 
 // ---- PWA: オフライン用Service Worker ----
 if ("serviceWorker" in navigator && location.protocol !== "file:") {

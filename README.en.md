@@ -10,6 +10,7 @@ Write Markdown on the left and see it rendered instantly on the right. A formatt
 
 ## Features
 
+- **Tabs**: open and edit several Markdown files at once, switching between them freely
 - **Split-pane editing with live preview** (including pipe tables)
 - **Formatting toolbar**: bold, italic, strikethrough, headings, bullet/numbered lists, task lists, blockquotes, code, tables, and links — all one click away
 - **Lightweight syntax highlighting** for headings, lists, quotes, and code (colors are customizable)
@@ -43,9 +44,11 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 
 | Action | How |
 |---|---|
-| Open a file | Toolbar "Open" / Ctrl+O / drag & drop onto the window |
-| Save | "Save" / Ctrl+S |
-| Save As | "Save As" / Ctrl+Shift+S |
+| Open a file (adds a new tab) | Toolbar "Open" / Ctrl+O / drag & drop onto the window (supports selecting or dropping multiple files at once) |
+| New tab (blank file) | The "+" button on the tab bar |
+| Close a tab | Each tab's "×" button (prompts a confirmation dialog if there are unsaved changes) |
+| Save | "Save" / Ctrl+S (applies to the active tab) |
+| Save As | "Save As" / Ctrl+Shift+S (applies to the active tab) |
 | Bold / Italic | **B** / *I* buttons above the editor, or Ctrl+B / Ctrl+I |
 | Heading | **H** button (cycles H1 → H2 → H3 → none on each click) |
 | Bullet / numbered / task list, blockquote | Each has its own button (applies to selected lines; click again to remove) |
@@ -57,7 +60,7 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 | Customize colors | "Settings" button ("Reset to defaults" restores the originals) |
 | Toggle theme | Sun/moon icon button |
 
-An unsaved-changes dot (●) appears next to the filename, and closing the tab with unsaved changes prompts a confirmation dialog.
+An unsaved-changes dot (●) appears next to a tab's name, and closing that tab — or closing the app — with unsaved changes prompts a confirmation dialog.
 
 The "N characters / ~M tokens" indicator in the toolbar is a rough guide for pasting into AI chat tools. It isn't a real tokenizer — it estimates using "1 character ≈ 1 token" for full-width characters (e.g. Japanese) and "4 characters ≈ 1 token" for ASCII text, so actual token counts will vary.
 

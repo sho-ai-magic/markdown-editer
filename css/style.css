@@ -98,6 +98,84 @@ body {
 :root[data-theme="light"] #btn-theme .icon-moon { display: none; }
 :root[data-theme="dark"] #btn-theme .icon-sun { display: none; }
 
+/* ===== タブバー（複数ファイルの同時編集） ===== */
+#tab-bar {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+
+.tab-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  max-width: 220px;
+  padding: 0 4px 0 10px;
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid transparent;
+}
+.tab-chip.active {
+  background: var(--bg);
+  border-bottom-color: var(--link);
+}
+
+.tab-select {
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 2px;
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+.tab-chip.active .tab-select { color: var(--link); font-weight: 600; }
+
+.tab-dirty-dot {
+  flex-shrink: 0;
+  color: #e05252;
+  font-size: 10px;
+}
+.tab-dirty-dot::before { content: "●"; }
+
+.tab-close, .tab-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+.tab-close:hover, .tab-new:hover { background: var(--code-bg); color: var(--link); }
+.tab-close .icon, .tab-new .icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tab-new { margin: 4px 6px; }
+
+.tab-select:focus-visible, .tab-close:focus-visible, .tab-new:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: -2px;
+}
+
 #file-name {
   font-size: 13px;
   font-weight: 600;
@@ -448,6 +526,10 @@ body {
   /* メインツールバーはアイコンのみにして横幅を節約（title/aria-labelで代替） */
   .tool-btn .btn-label { display: none; }
   .tool-btn { padding: 6px 8px; }
+
+  /* タブが多いときは横スクロールで対応し、1タブあたりの幅は少し狭める */
+  .tab-chip { max-width: 130px; }
+  .tab-select { max-width: 80px; }
 
   #view-switch { display: flex; }
 

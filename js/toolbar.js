@@ -236,5 +236,7 @@ export function initToolbar({ cm, toolbarEl, charCountEl, copyMdBtn, copyRichBtn
   return {
     bold: actions.bold,
     italic: actions.italic,
+    // タブ切替時、swapDoc()はchangeイベントを発火しないため手動で呼び直す用
+    refreshCharCount,
   };
 }

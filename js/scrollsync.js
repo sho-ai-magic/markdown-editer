@@ -10,14 +10,17 @@ export function initScrollSync(cm, previewPane) {
   let suspended = false;
   let resumeTimer = null;
 
-  cm.on("scroll", () => {
-    if (suspended) return;
+  function sync() {
     const info = cm.getScrollInfo();
     const topLine = cm.lineAtHeight(info.top, "local");
     const totalLines = cm.lineCount();
     const ratio = totalLines > 1 ? topLine / (totalLines - 1) : 0;
     const maxScroll = previewPane.scrollHeight - previewPane.clientHeight;
     previewPane.scrollTop = Math.max(0, Math.min(1, ratio)) * Math.max(0, maxScroll);
+  }
+
+  cm.on("scroll", () => {
+    if (!suspended) sync();
   });
 
   return {
@@ -33,5 +36,7 @@ export function initScrollSync(cm, previewPane) {
         suspended = false;
       }, 150);
     },
+    // タブ切替直後など、scrollイベントを待たず即座に同期させたい場合に呼ぶ
+    syncNow: sync,
   };
 }
