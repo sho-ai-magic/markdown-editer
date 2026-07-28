@@ -7,21 +7,27 @@ import { initSettings } from "./settings.js";
 import { initToolbar } from "./toolbar.js";
 import { initTabs } from "./tabs.js";
 import { initExplorer } from "./explorer.js";
+import { initSplitter } from "./splitter.js";
 
 const $ = (id) => document.getElementById(id);
 
-// ---- 設定（テーマ・色）を最初に適用してから画面を組み立てる ----
-initSettings({
+// ---- 設定（テーマ・色・エディタ表示）を最初に適用してから画面を組み立てる ----
+// フォントサイズ等の変更時はCodeMirrorの再計測(refresh)が必要だが、cmは
+// この時点ではまだ存在しないため、差し替え可能な参照を経由して呼ぶ。
+let refreshEditor = () => {};
+const settings = initSettings({
   overlayEl: $("settings-overlay"),
   panelEl: $("settings-panel"),
   openBtn: $("btn-settings"),
   closeBtn: $("btn-close-settings"),
   resetBtn: $("btn-reset-colors"),
   themeBtn: $("btn-theme"),
+  onPrefsChange: () => refreshEditor(),
 });
 
 // ---- エディタ・プレビュー ----
 const cm = createEditor($("editor-host"));
+refreshEditor = () => cm.refresh();
 const previewPane = $("preview-pane");
 const previewEl = $("preview");
 const previewMetaEl = $("preview-meta");
@@ -124,7 +130,23 @@ const tabs = initTabs({
     scrollSync.syncNow();
     historyPanel.hidden = true;
   },
+  onTabBarRender: () => updateTabScrollButtons(),
 });
+
+// ---- タブバーのスクロールボタン（タブがはみ出しているときだけ表示） ----
+const tabBarEl = $("tab-bar");
+const tabScrollLeftBtn = $("tab-scroll-left");
+const tabScrollRightBtn = $("tab-scroll-right");
+
+function updateTabScrollButtons() {
+  const overflow = tabBarEl.scrollWidth > tabBarEl.clientWidth + 1;
+  tabScrollLeftBtn.hidden = !overflow;
+  tabScrollRightBtn.hidden = !overflow;
+}
+
+tabScrollLeftBtn.addEventListener("click", () => tabBarEl.scrollBy({ left: -150, behavior: "smooth" }));
+tabScrollRightBtn.addEventListener("click", () => tabBarEl.scrollBy({ left: 150, behavior: "smooth" }));
+new ResizeObserver(updateTabScrollButtons).observe(tabBarEl);
 
 // ---- ファイルエクスプローラー（目次パネル内、フォルダを開いてMarkdown
 // ファイルを新規タブとして開く。File System Access API対応ブラウザのみ） ----
@@ -145,6 +167,59 @@ const files = initFiles({
 $("btn-open").addEventListener("click", () => files.openFile());
 $("btn-save").addEventListener("click", () => files.saveFile());
 $("btn-save-as").addEventListener("click", () => files.saveFileAs());
+
+// ---- 自動保存（設定で有効化。入力が止まって3秒後に上書き保存） ----
+// ファイルハンドルを持つタブのみ対象（白紙タブで保存ダイアログが勝手に
+// 開かないようにするため。silent指定で成功トーストも出さない）。
+const autoSaveDebounced = debounce(() => {
+  const tab = tabs.getActive();
+  if (!settings.getPrefs().autoSave) return;
+  if (!tab || !tab.fileHandle) return;
+  if (tab.doc.isClean(tab.cleanGen)) return;
+  files.saveFile({ silent: true });
+}, 3000);
+cm.on("change", autoSaveDebounced);
+
+// ---- ペイン幅のドラッグ調整 ----
+// 幅はCSS変数(--toc-width / --editor-pct)経由で適用する。インラインstyleを
+// ペインに直接書かないことで、preview-closed等の表示モードCSSがそのまま効く。
+const LAYOUT_KEY = "mdeditor.layout";
+let layout = {};
+try {
+  layout = JSON.parse(localStorage.getItem(LAYOUT_KEY) || "{}");
+} catch {
+  layout = {};
+}
+
+function applyLayout() {
+  if (layout.tocWidth) mainEl.style.setProperty("--toc-width", `${layout.tocWidth}px`);
+  if (layout.editorPct) mainEl.style.setProperty("--editor-pct", `${layout.editorPct}%`);
+}
+function saveLayout() {
+  localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout));
+  cm.refresh();
+}
+applyLayout();
+
+initSplitter($("splitter-toc"), {
+  onDrag: (clientX) => {
+    const mainRect = mainEl.getBoundingClientRect();
+    layout.tocWidth = Math.min(400, Math.max(160, Math.round(clientX - mainRect.left)));
+    applyLayout();
+  },
+  onEnd: saveLayout,
+});
+
+initSplitter($("splitter-panes"), {
+  onDrag: (clientX) => {
+    const mainRect = mainEl.getBoundingClientRect();
+    const editorLeft = $("editor-pane").getBoundingClientRect().left;
+    const pct = ((clientX - editorLeft) / mainRect.width) * 100;
+    layout.editorPct = Math.min(80, Math.max(20, Math.round(pct * 10) / 10));
+    applyLayout();
+  },
+  onEnd: saveLayout,
+});
 
 // キーボードショートカット
 window.addEventListener("keydown", (e) => {

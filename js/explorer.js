@@ -2,11 +2,46 @@
 // 開けるようにする。File System Access API (showDirectoryPicker) が必要なため、
 // Chrome/Edge等の対応ブラウザのみで利用できる。
 //
-// 開いたフォルダはこのセッション内のみ保持する（アプリの再読み込みでは復元しない。
-// 既存のタブが再読み込みで復元されないのと同じ設計方針）。
+// 開いたフォルダのハンドルはIndexedDBに保存し、再読み込み後は
+// 「前回のフォルダを開く」ボタンから再許可の確認を経て1クリックで復元できる。
+
+import { toast } from "./ui.js";
 
 const MD_EXTENSIONS = [".md", ".markdown", ".txt"];
 const hasDirPicker = "showDirectoryPicker" in window;
+
+// ---- IndexedDB: 前回開いたフォルダのハンドルを保存する（約30行の自前ヘルパー） ----
+const DB_NAME = "mdeditor";
+const STORE = "handles";
+const LAST_FOLDER_KEY = "lastFolder";
+
+function openDb() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbPut(key, value) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function idbGet(key) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const req = db.transaction(STORE, "readonly").objectStore(STORE).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
 
 function isMarkdownFile(name) {
   const lower = name.toLowerCase();
@@ -47,7 +82,7 @@ export function initExplorer({ treeEl, openFolderBtn, emptyStateEl, tabs }) {
       const text = await file.text();
       tabs.openInNewTab(text, file.name, fileHandle);
     } catch (err) {
-      alert(`ファイルを開けませんでした: ${err.message}`);
+      toast(`ファイルを開けませんでした: ${err.message}`, { type: "error" });
     }
   }
 
@@ -96,23 +131,62 @@ export function initExplorer({ treeEl, openFolderBtn, emptyStateEl, tabs }) {
     return li;
   }
 
+  async function renderTree(dirHandle) {
+    const entries = await readEntries(dirHandle);
+    treeEl.textContent = "";
+    entries.forEach((entry) => treeEl.appendChild(buildRow(entry, 0)));
+    const isEmpty = entries.length === 0;
+    treeEl.hidden = isEmpty;
+    emptyStateEl.hidden = !isEmpty;
+    if (isEmpty) emptyStateEl.textContent = "Markdownファイルが見つかりませんでした";
+    if (restoreBtn) restoreBtn.hidden = true;
+  }
+
   async function openRoot() {
     try {
       const dirHandle = await window.showDirectoryPicker({ mode: "readwrite" });
-      const entries = await readEntries(dirHandle);
-      treeEl.textContent = "";
-      entries.forEach((entry) => treeEl.appendChild(buildRow(entry, 0)));
-      const isEmpty = entries.length === 0;
-      treeEl.hidden = isEmpty;
-      emptyStateEl.hidden = !isEmpty;
-      if (isEmpty) emptyStateEl.textContent = "Markdownファイルが見つかりませんでした";
+      await renderTree(dirHandle);
+      // 次回起動時に「前回のフォルダを開く」で復元できるよう保存する
+      // （FileSystemDirectoryHandleはIndexedDBに保存可能。失敗しても機能自体は動くので黙殺）
+      idbPut(LAST_FOLDER_KEY, dirHandle).catch(() => {});
     } catch (err) {
       if (err && err.name === "AbortError") return; // キャンセル
-      alert(`フォルダを開けませんでした: ${err.message}`);
+      toast(`フォルダを開けませんでした: ${err.message}`, { type: "error" });
     }
   }
 
   openFolderBtn.addEventListener("click", openRoot);
+
+  // ---- 前回のフォルダの復元 ----
+  // 保存済みハンドルがあれば「前回のフォルダを開く」ボタンを表示する。
+  // クリック時に再許可を求め（ブラウザの仕様上、確認ダイアログが1回出る）、
+  // 許可されればツリーを描画する。
+  let restoreBtn = null;
+  idbGet(LAST_FOLDER_KEY)
+    .then((savedHandle) => {
+      if (!savedHandle || typeof savedHandle.requestPermission !== "function") return;
+      restoreBtn = document.createElement("button");
+      restoreBtn.id = "btn-restore-folder";
+      restoreBtn.className = "explorer-open-btn";
+      restoreBtn.innerHTML =
+        '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span></span>';
+      restoreBtn.querySelector("span").textContent = `前回のフォルダを開く: ${savedHandle.name}`;
+      restoreBtn.title = savedHandle.name;
+      restoreBtn.addEventListener("click", async () => {
+        try {
+          const perm = await savedHandle.requestPermission({ mode: "readwrite" });
+          if (perm !== "granted") {
+            toast("フォルダへのアクセスが許可されませんでした", { type: "error" });
+            return;
+          }
+          await renderTree(savedHandle);
+        } catch (err) {
+          toast(`フォルダを開けませんでした: ${err.message}`, { type: "error" });
+        }
+      });
+      openFolderBtn.insertAdjacentElement("afterend", restoreBtn);
+    })
+    .catch(() => {});
 
   return {};
 }

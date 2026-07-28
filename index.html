@@ -8,6 +8,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="vendor/codemirror/dialog.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -59,9 +60,17 @@
   </div>
 </header>
 
-<div id="tab-bar" role="tablist" aria-label="開いているファイル">
-  <button id="btn-new-tab" class="tab-new" title="新しいタブ（無題のファイル）">
-    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+<div id="tab-bar-wrap">
+  <button id="tab-scroll-left" class="tab-scroll" title="タブを左へスクロール" hidden>
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <div id="tab-bar" role="tablist" aria-label="開いているファイル">
+    <button id="btn-new-tab" class="tab-new" title="新しいタブ（無題のファイル）">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+  <button id="tab-scroll-right" class="tab-scroll" title="タブを右へスクロール" hidden>
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
   </button>
 </div>
 
@@ -95,6 +104,7 @@
     </div>
   </nav>
   <div id="toc-backdrop"></div>
+  <div id="splitter-toc" class="splitter" title="ドラッグで目次の幅を調整"></div>
   <section id="editor-pane" aria-label="編集画面">
     <div id="format-toolbar" role="toolbar" aria-label="書式ツールバー">
       <button class="fmt-btn" data-fmt="bold" title="太字 (Ctrl+B)"><b>B</b></button>
@@ -163,6 +173,7 @@
     </div>
     <div id="editor-host"></div>
   </section>
+  <div id="splitter-panes" class="splitter" title="ドラッグでエディタ/プレビューの幅を調整"></div>
   <section id="preview-pane" aria-label="プレビュー画面">
     <div id="preview-meta"></div>
     <article id="preview"></article>
@@ -171,7 +182,22 @@
 
 <div id="settings-overlay" hidden>
   <div id="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-    <h2 id="settings-title">色の設定</h2>
+    <h2 id="settings-title">設定</h2>
+    <h3 class="settings-section">エディタ</h3>
+    <div class="setting-row">
+      <label for="pref-font-size">文字サイズ (px)</label>
+      <input type="number" id="pref-font-size" data-pref-key="fontSize" min="12" max="24" step="1">
+    </div>
+    <div class="setting-row">
+      <label for="pref-line-height">行間</label>
+      <input type="number" id="pref-line-height" data-pref-key="lineHeight" min="1.4" max="2.2" step="0.1">
+    </div>
+    <h3 class="settings-section">保存</h3>
+    <div class="setting-row">
+      <label for="pref-auto-save">自動保存（入力が止まって3秒後に上書き保存）</label>
+      <input type="checkbox" id="pref-auto-save" data-pref-key="autoSave">
+    </div>
+    <h3 class="settings-section">色</h3>
     <div class="setting-row">
       <label for="color-heading">見出しの色</label>
       <input type="color" id="color-heading" data-color-key="heading">
@@ -210,6 +236,9 @@
 <input type="file" id="file-input" accept=".md,.markdown,.txt,text/markdown,text/plain" hidden>
 
 <script src="vendor/codemirror/codemirror.js"></script>
+<script src="vendor/codemirror/dialog.js"></script>
+<script src="vendor/codemirror/searchcursor.js"></script>
+<script src="vendor/codemirror/search.js"></script>
 <script src="vendor/markdown-it.min.js"></script>
 <script type="module" src="js/app.js"></script>
 </body>

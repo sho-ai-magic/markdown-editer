@@ -4,6 +4,8 @@
 // 未対応ブラウザ(Firefox/Safari)ではファイル選択ダイアログ+ダウンロード保存に
 // フォールバックする。
 
+import { toast } from "./ui.js";
+
 const FILE_TYPES = [
   {
     description: "Markdownファイル",
@@ -30,7 +32,7 @@ export function initFiles({ cm, tabs, fileInputEl }) {
         }
       } catch (err) {
         if (err && err.name === "AbortError") return; // キャンセル
-        alert(`ファイルを開けませんでした: ${err.message}`);
+        toast(`ファイルを開けませんでした: ${err.message}`, { type: "error" });
       }
     } else {
       fileInputEl.value = "";
@@ -51,23 +53,26 @@ export function initFiles({ cm, tabs, fileInputEl }) {
     await writable.close();
   }
 
-  async function saveFile() {
+  // silent: 自動保存用。成功トーストを出さず、ハンドルのないタブでは
+  // 「名前を付けて保存」ダイアログを勝手に開かずに何もしない。
+  async function saveFile({ silent = false } = {}) {
     const tab = tabs.getActive();
     if (!tab) return;
     if (!hasFsAccess) {
-      downloadFallback(tab);
+      if (!silent) downloadFallback(tab);
       return;
     }
     if (!tab.fileHandle) {
-      await saveFileAs();
+      if (!silent) await saveFileAs();
       return;
     }
     try {
       await writeToHandle(tab.fileHandle, cm.getValue());
       tabs.markActiveSaved(tab.fileHandle, tab.fileName);
+      if (!silent) toast("保存しました");
     } catch (err) {
       if (err && err.name === "AbortError") return;
-      alert(`保存できませんでした: ${err.message}`);
+      toast(`保存できませんでした: ${err.message}`, { type: "error" });
     }
   }
 
@@ -85,9 +90,10 @@ export function initFiles({ cm, tabs, fileInputEl }) {
       });
       await writeToHandle(handle, cm.getValue());
       tabs.markActiveSaved(handle, handle.name);
+      toast("保存しました");
     } catch (err) {
       if (err && err.name === "AbortError") return;
-      alert(`保存できませんでした: ${err.message}`);
+      toast(`保存できませんでした: ${err.message}`, { type: "error" });
     }
   }
 

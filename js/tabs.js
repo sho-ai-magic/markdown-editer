@@ -10,10 +10,12 @@
 // 再描画・文字数カウンター・スクロール同期は呼び出し側の onActivate で
 // 明示的に行う必要がある。
 
+import { confirmDialog } from "./ui.js";
+
 // タブごとの保存バージョン履歴の上限（セッション内のみメモリ保持。古いものから破棄）
 const MAX_VERSIONS = 20;
 
-export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
+export function initTabs({ cm, tabBarEl, newTabBtn, onActivate, onTabBarRender }) {
   const tabs = [];
   let activeId = null;
   let idCounter = 0;
@@ -73,6 +75,11 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
 
       tabBarEl.insertBefore(chip, newTabBtn);
     });
+
+    // アクティブなタブが常に見える位置に来るよう自動スクロール
+    const activeChip = tabBarEl.querySelector(".tab-chip.active");
+    if (activeChip) activeChip.scrollIntoView({ inline: "nearest", block: "nearest" });
+    if (onTabBarRender) onTabBarRender();
   }
 
   // アクティブなタブの未保存●表示だけを更新する（キー入力のたびにタブバー
@@ -123,17 +130,21 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
     return addTab("", uniqueBlankName(), null);
   }
 
-  function confirmDiscard(tab) {
+  async function confirmDiscard(tab) {
     if (tab.doc.isClean(tab.cleanGen)) return true;
-    return window.confirm(
-      `「${tab.fileName}」には未保存の変更があります。\n保存せずに閉じますか？`
-    );
+    return confirmDialog({
+      message: `「${tab.fileName}」には未保存の変更があります。保存せずに閉じますか？`,
+      okLabel: "保存せずに閉じる",
+      cancelLabel: "キャンセル",
+    });
   }
 
-  function closeTab(id) {
+  async function closeTab(id) {
     const tab = findTab(id);
     if (!tab) return;
-    if (!confirmDiscard(tab)) return;
+    if (!(await confirmDiscard(tab))) return;
+    // 確認ダイアログ表示中に既に閉じられていた場合は何もしない
+    if (!findTab(id)) return;
 
     const index = tabs.indexOf(tab);
     tabs.splice(index, 1);
@@ -157,8 +168,14 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
     if (fileHandle) tab.fileHandle = fileHandle;
     if (fileName) tab.fileName = fileName;
     tab.cleanGen = tab.doc.changeGeneration(true);
-    tab.versions.push({ content: tab.doc.getValue(), savedAt: Date.now() });
-    if (tab.versions.length > MAX_VERSIONS) tab.versions.shift();
+    // 直前のバージョンと同一内容なら記録しない（自動保存や保存連打で
+    // 履歴が同じ内容で埋まるのを防ぐ）
+    const content = tab.doc.getValue();
+    const last = tab.versions[tab.versions.length - 1];
+    if (!last || last.content !== content) {
+      tab.versions.push({ content, savedAt: Date.now() });
+      if (tab.versions.length > MAX_VERSIONS) tab.versions.shift();
+    }
     renderTabBar();
   }
 

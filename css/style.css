@@ -156,13 +156,49 @@ body {
 .view-mode-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
 
 /* ===== タブバー（複数ファイルの同時編集） ===== */
+#tab-bar-wrap {
+  display: flex;
+  align-items: stretch;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+}
+
 #tab-bar {
   display: flex;
   align-items: stretch;
   overflow-x: auto;
-  background: var(--toolbar-bg);
-  border-bottom: 1px solid var(--border);
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  scrollbar-width: none; /* スクロールは左右ボタン+ホイールで行うためバーは隠す */
+}
+#tab-bar::-webkit-scrollbar { display: none; }
+
+/* タブがはみ出しているときだけ表示される左右スクロールボタン */
+.tab-scroll {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  padding: 0;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+#tab-scroll-right { border-right: none; border-left: 1px solid var(--border); }
+.tab-scroll:hover { background: var(--code-bg); color: var(--link); }
+.tab-scroll[hidden] { display: none; }
+.tab-scroll .icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .tab-chip {
@@ -256,7 +292,7 @@ body {
 }
 
 #toc {
-  flex: 0 0 220px;
+  flex: 0 0 var(--toc-width, 220px);
   overflow-y: auto;
   background: var(--toc-bg);
   border-right: 1px solid var(--border);
@@ -393,12 +429,33 @@ body {
 .explorer-folder.expanded .explorer-chevron { transform: rotate(90deg); }
 .explorer-spacer { width: 14px; flex-shrink: 0; }
 
-/* 編集画面とプレビュー画面は左右半分ずつ */
+/* 編集画面とプレビュー画面（既定は半分ずつ。スプリッターのドラッグで可変） */
 #editor-pane, #preview-pane {
-  flex: 1 1 50%;
   min-width: 0;
   min-height: 0;
 }
+#editor-pane { flex: 0 0 var(--editor-pct, 50%); }
+#preview-pane { flex: 1 1 auto; }
+
+/* ペイン幅調整のスプリッター */
+.splitter {
+  flex: 0 0 5px;
+  cursor: col-resize;
+  background: transparent;
+  border-left: 1px solid var(--border);
+  margin-left: -1px; /* 隣のペインのborder-rightと重ねて太く見えないようにする */
+  transition: background-color .15s ease;
+  touch-action: none;
+}
+.splitter:hover, .splitter.dragging { background: var(--link); opacity: 0.5; }
+body.splitter-dragging { user-select: none; cursor: col-resize; }
+
+/* プレビューまたはエディタを閉じているときは中央のスプリッターも隠す */
+#main.preview-closed #splitter-panes,
+#main.editor-closed #splitter-panes { display: none; }
+
+/* 目次パネルが非表示のときは目次側のスプリッターも隠す */
+#toc.hidden ~ #splitter-toc { display: none; }
 
 #editor-pane {
   display: flex;
@@ -529,8 +586,8 @@ body {
 #editor-host .CodeMirror {
   height: 100%;
   font-family: "Noto Sans Mono CJK JP", Consolas, Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: var(--editor-font-size, 14px);
+  line-height: var(--editor-line-height, 1.6);
   background: var(--editor-bg);
   color: var(--fg);
   padding: 4px 8px;
@@ -739,6 +796,148 @@ body {
 }
 .settings-actions button:hover { border-color: var(--c-heading); }
 
+.settings-section {
+  margin: 14px 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--c-quote);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 4px;
+}
+#settings-panel .settings-section:first-of-type { margin-top: 0; }
+
+.setting-row input[type="number"] {
+  width: 64px;
+  font: inherit;
+  font-size: 13px;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+}
+.setting-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--link);
+  cursor: pointer;
+}
+.setting-row label { line-height: 1.4; }
+
+/* ===== トースト通知 ===== */
+#toast-container {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  pointer-events: none;
+}
+.toast {
+  max-width: min(80vw, 360px);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .25s ease, transform .25s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast-success { background: #2f8f4e; }
+.toast-error { background: #d64545; }
+
+/* ===== 確認モーダル（confirm()の置き換え） ===== */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 150;
+}
+.confirm-panel {
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  min-width: 300px;
+  max-width: min(90vw, 420px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+.confirm-message {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.confirm-actions button {
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+.confirm-actions .confirm-ok {
+  background: var(--link);
+  border-color: var(--link);
+  color: #fff;
+}
+.confirm-actions button:hover { filter: brightness(1.08); }
+.confirm-actions button:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+
+/* ===== 検索・置換ダイアログ（CodeMirrorアドオン）のテーマ調整 ===== */
+.CodeMirror-dialog {
+  background: var(--toolbar-bg);
+  color: var(--fg);
+  border-bottom: 1px solid var(--border);
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.CodeMirror-dialog input {
+  font: inherit;
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border) !important;
+  border-radius: 4px;
+  padding: 2px 6px;
+  outline: none;
+}
+.CodeMirror-dialog input:focus { border-color: var(--link) !important; }
+.CodeMirror-dialog button {
+  font: inherit;
+  font-size: 12px;
+  margin-left: 6px;
+  padding: 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+}
+.CodeMirror-dialog button:hover { border-color: var(--link); color: var(--link); }
+
+/* 検索マッチのハイライト（選択色と区別できる控えめな色） */
+.cm-searching {
+  background: rgba(255, 193, 7, 0.35);
+  border-radius: 2px;
+}
+:root[data-theme="dark"] .cm-searching { background: rgba(255, 193, 7, 0.25); }
+
 /* ===== 編集/プレビュー切替タブ（モバイルのみ表示） ===== */
 #view-switch {
   display: none;
@@ -798,6 +997,9 @@ body {
   /* 編集/プレビュー切替タブと役割が重複するため、この専用コントロールは隠す */
   .view-mode-group { display: none; }
 
+  /* モバイルは排他表示レイアウトのため、ペイン幅調整のスプリッターは使わない */
+  .splitter { display: none; }
+
   #view-switch { display: flex; }
 
   #main { position: relative; }
@@ -845,4 +1047,43 @@ body {
     opacity: 1;
     pointer-events: auto;
   }
+}
+
+/* ===== 印刷（Ctrl+P）: リッチプレビューだけを紙に流し込む ===== */
+@media print {
+  html, body {
+    height: auto;
+    overflow: visible;
+    background: #ffffff;
+  }
+  /* エディタ・各種バー・目次は印刷しない */
+  #toolbar, #tab-bar-wrap, #view-switch, #toc, #toc-backdrop,
+  #editor-pane, .splitter, #toast-container, .confirm-overlay,
+  #settings-overlay {
+    display: none !important;
+  }
+  #main {
+    display: block;
+    overflow: visible;
+  }
+  #preview-pane {
+    display: block !important;
+    overflow: visible;
+    width: 100%;
+    background: #ffffff;
+  }
+  #preview {
+    max-width: none;
+    padding: 0;
+    color: #000000;
+  }
+  #preview-meta { margin: 0 0 12px; max-width: none; }
+  /* 画面用の影は印刷では省き、コードブロックのダーク配色だけは維持する */
+  #preview img, #preview pre, #preview table { box-shadow: none; }
+  #preview pre {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    break-inside: avoid;
+  }
+  #preview table, #preview blockquote { break-inside: avoid; }
 }

@@ -5,6 +5,8 @@
 // Markdownの記法を覚えなくても操作できるようにする狙い（非エンジニア想定）。
 // 外部の書式編集ライブラリは使わず、CodeMirrorの選択範囲API上に薄く実装する。
 
+import { toast } from "./ui.js";
+
 // ボタンをmousedownした瞬間にエディタの選択範囲・フォーカスが失われるのを防ぐ
 function preserveEditorFocus(btn) {
   btn.addEventListener("mousedown", (e) => e.preventDefault());
@@ -178,7 +180,7 @@ async function copyMarkdown(cm, btn) {
     await navigator.clipboard.writeText(cm.getValue());
     flashButton(btn, "コピーしました");
   } catch (err) {
-    alert(`コピーできませんでした: ${err.message}`);
+    toast(`コピーできませんでした: ${err.message}`, { type: "error" });
   }
 }
 
@@ -199,7 +201,7 @@ async function copyRichText(cm, previewEl, btn) {
     }
     flashButton(btn, "コピーしました");
   } catch (err) {
-    alert(`コピーできませんでした: ${err.message}`);
+    toast(`コピーできませんでした: ${err.message}`, { type: "error" });
   }
 }
 

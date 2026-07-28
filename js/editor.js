@@ -28,6 +28,21 @@ CodeMirror.defineMode("mdlite", () => ({
   },
 }));
 
+// 検索アドオン（vendor/codemirror/search.js等）のダイアログ文言を日本語化する
+const SEARCH_PHRASES = {
+  "Search:": "検索:",
+  "(Use /re/ syntax for regexp search)": "（/正規表現/ の形式で正規表現検索）",
+  "Replace:": "置換対象:",
+  "Replace with:": "置換後:",
+  "Replace all:": "すべて置換:",
+  "With:": "置換後:",
+  "Replace?": "置換しますか？",
+  "Yes": "はい",
+  "No": "いいえ",
+  "All": "すべて",
+  "Stop": "中止",
+};
+
 export function createEditor(parentEl) {
   return CodeMirror(parentEl, {
     mode: "mdlite",
@@ -36,5 +51,12 @@ export function createEditor(parentEl) {
     autofocus: true,
     // ドロップされたファイルはアプリ側(files.js)で処理する
     dragDrop: false,
+    phrases: SEARCH_PHRASES,
+    extraKeys: {
+      // 検索(Ctrl-F)・次へ(Ctrl-G)等はアドオンの標準キーマップ。
+      // 置換はWindows系エディタで馴染みのあるCtrl-Hにも割り当てる
+      "Ctrl-H": "replace",
+      "Cmd-Alt-F": "replace",
+    },
   });
 }
