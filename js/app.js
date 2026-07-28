@@ -67,7 +67,14 @@ const toolbarActions = initToolbar({
   charCountEl: $("char-count"),
   copyMdBtn: $("btn-copy-md"),
   copyRichBtn: $("btn-copy-rich"),
+  richHtmlBtn: $("btn-rich-html"),
   previewEl,
+});
+
+// ---- プレビューの表示/非表示（デスクトップ向け。モバイルは編集/プレビュー
+// 切替タブが同じ役割を果たすため、このボタン自体をCSSで非表示にしている） ----
+$("btn-toggle-preview").addEventListener("click", () => {
+  mainEl.classList.toggle("preview-closed");
 });
 
 // ---- タブ（複数ファイルの同時編集） ----

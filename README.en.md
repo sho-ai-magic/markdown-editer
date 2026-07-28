@@ -16,6 +16,8 @@ Write Markdown on the left and see it rendered instantly on the right. A formatt
 - **Lightweight syntax highlighting** for headings, lists, quotes, and code (colors are customizable)
 - **Character / approximate token counter**: gauge your text length before pasting into an AI chat (computed entirely locally, no network calls)
 - **Copy as Markdown or as rich text**: one click to copy the raw Markdown, or copy formatted HTML that pastes with headings, bold text, and tables intact into Google Docs, Word, etc.
+- **Toggle the preview pane** on or off to use the full width for editing
+- **Rich HTML view**: beyond the live preview, open a separate, nicely designed standalone HTML version (generous spacing, comfortable line height, reading-friendly type) in a new tab — use your browser's own save/print for output
 - **Table of contents sidebar**: click any heading to jump both the editor and the preview to that spot
 - **Light / dark theme** toggle, remembered across restarts
 - **Open / Save / Save As** (Ctrl+O / Ctrl+S / Ctrl+Shift+S), plus drag-and-drop to open files
@@ -56,7 +58,9 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 | Table / Link | Each has its own button (link inserts with the URL portion pre-selected for quick editing) |
 | Copy Markdown source | "Copy" button |
 | Copy as rich text | "Rich text" button (pastes with headings/bold intact into Google Docs, etc.) |
+| Open the rich HTML view in a new tab | "HTML view" button (reading-friendly design; use your browser's own save/print) |
 | Toggle table of contents | Hamburger menu button |
+| Toggle the preview pane | "Preview" button (hidden on mobile, where the editor/preview tabs already do this) |
 | Customize colors | "Settings" button ("Reset to defaults" restores the originals) |
 | Toggle theme | Sun/moon icon button |
 

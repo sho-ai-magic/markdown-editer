@@ -257,6 +257,13 @@ body {
   background: var(--editor-bg);
 }
 
+/* プレビューの表示/非表示（デスクトップ向け。「プレビュー」ボタンで切替） */
+#main.preview-closed #preview-pane { display: none; }
+#main.preview-closed #editor-pane {
+  flex: 1 1 100%;
+  border-right: none;
+}
+
 /* ===== 書式ツールバー ===== */
 #format-toolbar {
   display: flex;
@@ -530,6 +537,9 @@ body {
   /* タブが多いときは横スクロールで対応し、1タブあたりの幅は少し狭める */
   .tab-chip { max-width: 130px; }
   .tab-select { max-width: 80px; }
+
+  /* 編集/プレビュー切替タブと役割が重複するため、この専用トグルは隠す */
+  #btn-toggle-preview { display: none; }
 
   #view-switch { display: flex; }
 

@@ -5,6 +5,8 @@
 // Markdownの記法を覚えなくても操作できるようにする狙い（非エンジニア想定）。
 // 外部の書式編集ライブラリは使わず、CodeMirrorの選択範囲API上に薄く実装する。
 
+import { openRichHtml } from "./richhtml.js";
+
 // ボタンをmousedownした瞬間にエディタの選択範囲・フォーカスが失われるのを防ぐ
 function preserveEditorFocus(btn) {
   btn.addEventListener("mousedown", (e) => e.preventDefault());
@@ -203,7 +205,7 @@ async function copyRichText(cm, previewEl, btn) {
   }
 }
 
-export function initToolbar({ cm, toolbarEl, charCountEl, copyMdBtn, copyRichBtn, previewEl }) {
+export function initToolbar({ cm, toolbarEl, charCountEl, copyMdBtn, copyRichBtn, richHtmlBtn, previewEl }) {
   const actions = {
     bold: () => wrapInline(cm, "**"),
     italic: () => wrapInline(cm, "*"),
@@ -231,6 +233,12 @@ export function initToolbar({ cm, toolbarEl, charCountEl, copyMdBtn, copyRichBtn
   preserveEditorFocus(copyRichBtn);
   copyMdBtn.addEventListener("click", () => copyMarkdown(cm, copyMdBtn));
   copyRichBtn.addEventListener("click", () => copyRichText(cm, previewEl, copyRichBtn));
+
+  preserveEditorFocus(richHtmlBtn);
+  richHtmlBtn.addEventListener("click", () => {
+    const title = previewEl.querySelector("h1,h2,h3")?.textContent?.trim() || "Markdownドキュメント";
+    openRichHtml(previewEl.innerHTML, title);
+  });
 
   // Ctrl+B / Ctrl+I ショートカット（太字・斜体はよく使うため）
   return {
