@@ -11,6 +11,8 @@ export const COLOR_DEFAULTS = {
   quote: "#8a8a8a",
   code: "#a13fbf",
   tableBorder: "#999999",
+  rpAccent1: "#6366f1",
+  rpAccent2: "#a855f7",
 };
 
 const COLOR_VARS = {
@@ -19,6 +21,8 @@ const COLOR_VARS = {
   quote: "--c-quote",
   code: "--c-code",
   tableBorder: "--c-table-border",
+  rpAccent1: "--rp-accent-1",
+  rpAccent2: "--rp-accent-2",
 };
 
 function loadColors() {

@@ -17,6 +17,19 @@
   --c-quote: #8a8a8a;
   --c-code: #a13fbf;
   --c-table-border: #999999;
+
+  /* リッチプレビューのアクセントカラー（既定値。設定モーダルでカスタマイズ可能） */
+  --rp-accent-1: #6366f1;
+  --rp-accent-2: #a855f7;
+  /* ダークテーマ向けに自動調整した色（ライトはそのまま） */
+  --rp-accent-1-d: var(--rp-accent-1);
+  --rp-accent-2-d: var(--rp-accent-2);
+  --rp-callout-bg: color-mix(in srgb, var(--rp-accent-2-d) 8%, transparent);
+  --rp-table-header-bg: color-mix(in srgb, var(--rp-accent-1-d) 10%, transparent);
+  --rp-table-stripe: rgba(0, 0, 0, 0.025);
+  --rp-code-bg: #1e1e2e;
+  --rp-code-fg: #e2e8f0;
+  --rp-shadow: 0 1px 3px rgba(20, 20, 40, 0.08), 0 8px 24px rgba(20, 20, 40, 0.06);
 }
 
 :root[data-theme="dark"] {
@@ -29,6 +42,14 @@
   --toc-bg: #252526;
   --link: #4ea1ff;
   --code-bg: rgba(255, 255, 255, 0.08);
+
+  --rp-accent-1-d: color-mix(in srgb, var(--rp-accent-1) 75%, white);
+  --rp-accent-2-d: color-mix(in srgb, var(--rp-accent-2) 75%, white);
+  --rp-callout-bg: color-mix(in srgb, var(--rp-accent-2-d) 14%, transparent);
+  --rp-table-header-bg: color-mix(in srgb, var(--rp-accent-1-d) 16%, transparent);
+  --rp-table-stripe: rgba(255, 255, 255, 0.03);
+  --rp-code-bg: #0b0d14;
+  --rp-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
 /* ===== 全体レイアウト ===== */
@@ -97,6 +118,42 @@ body {
 /* テーマ切替ボタン: 太陽/月の2アイコンをテーマ属性でCSS切り替え */
 :root[data-theme="light"] #btn-theme .icon-moon { display: none; }
 :root[data-theme="dark"] #btn-theme .icon-sun { display: none; }
+
+/* エディタ/プレビューの表示モード切替（3ボタンのセグメントコントロール） */
+.view-mode-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+}
+.view-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.view-mode-btn .icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.view-mode-btn:hover { color: var(--link); }
+.view-mode-btn.active { background: var(--link); color: #fff; }
+.view-mode-btn:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
 
 /* ===== タブバー（複数ファイルの同時編集） ===== */
 #tab-bar {
@@ -257,11 +314,15 @@ body {
   background: var(--editor-bg);
 }
 
-/* プレビューの表示/非表示（デスクトップ向け。「プレビュー」ボタンで切替） */
+/* エディタ/プレビューの表示モード（デスクトップ向け。上部の3ボタンで切替） */
 #main.preview-closed #preview-pane { display: none; }
 #main.preview-closed #editor-pane {
   flex: 1 1 100%;
   border-right: none;
+}
+#main.editor-closed #editor-pane { display: none; }
+#main.editor-closed #preview-pane {
+  flex: 1 1 100%;
 }
 
 /* ===== 書式ツールバー ===== */
@@ -340,69 +401,122 @@ body {
 .cm-md-quote   { color: var(--c-quote); font-style: italic; }
 .cm-md-code    { color: var(--c-code); }
 
-/* ===== プレビュー画面 ===== */
+/* ===== プレビュー画面（リッチデザイン） ===== */
 #preview-pane {
   overflow-y: auto;
   position: relative; /* 見出しのoffsetTop計算の基準にする */
   background: var(--preview-bg);
 }
 
+#preview-meta {
+  margin: 16px 24px 0;
+  max-width: 780px;
+  padding-bottom: 14px;
+  border-bottom: 3px solid transparent;
+  border-image: linear-gradient(90deg, var(--rp-accent-1-d), var(--rp-accent-2-d) 70%) 1;
+  color: var(--c-quote);
+  font-size: 0.85em;
+}
+#preview-meta[hidden] { display: none; }
+
 #preview {
   padding: 16px 24px 60vh; /* 下部余白: 最後の見出しでも先頭にジャンプできるように */
-  max-width: 860px;
-  line-height: 1.7;
+  max-width: 780px;
+  line-height: 1.75;
   word-wrap: break-word;
 }
 
 #preview h1, #preview h2, #preview h3,
 #preview h4, #preview h5, #preview h6 {
-  margin: 1.2em 0 0.5em;
+  margin: 1.3em 0 0.55em;
   line-height: 1.3;
+  font-weight: 700;
 }
-#preview h1 { font-size: 1.7em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
-#preview h2 { font-size: 1.4em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
-#preview h3 { font-size: 1.2em; }
+
+/* 先頭のh1はヒーロータイトル風に大きく・グラデーションで強調する */
+#preview > h1:first-child {
+  margin-top: 0.2em;
+  font-size: 2.1em;
+  letter-spacing: -0.01em;
+  background: linear-gradient(90deg, var(--rp-accent-1-d), var(--rp-accent-2-d) 60%, var(--rp-accent-2-d));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+#preview h1 { font-size: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+#preview h2 {
+  font-size: 1.32em;
+  border-left: 5px solid var(--rp-accent-1-d);
+  padding-left: 0.5em;
+}
+#preview h3 { font-size: 1.14em; color: var(--rp-accent-2-d); }
 
 #preview a { color: var(--link); }
 
-#preview img { max-width: 100%; }
+#preview img { max-width: 100%; border-radius: 8px; box-shadow: var(--rp-shadow); }
 
+/* 引用のコールアウト化 */
 #preview blockquote {
-  margin: 0.8em 0;
-  padding: 0.2em 1em;
-  color: var(--c-quote);
-  border-left: 4px solid var(--border);
+  margin: 1.1em 0;
+  padding: 0.7em 1.1em;
+  background: var(--rp-callout-bg);
+  border-left: 4px solid var(--rp-accent-2-d);
+  border-radius: 0 10px 10px 0;
+  color: var(--fg);
 }
+#preview blockquote p:last-child { margin-bottom: 0; }
 
 #preview code {
   font-family: "Noto Sans Mono CJK JP", Consolas, Menlo, monospace;
   font-size: 0.9em;
-  background: var(--code-bg);
+  background: var(--rp-callout-bg);
   border-radius: 4px;
   padding: 0.1em 0.35em;
 }
 
+/* コードブロックは常時ダーク基調配色+上部にグラデーションのアクセントバー */
 #preview pre {
-  background: var(--code-bg);
-  border-radius: 6px;
-  padding: 12px;
+  position: relative;
+  background: var(--rp-code-bg);
+  color: var(--rp-code-fg);
+  border-radius: 10px;
+  padding: 20px 14px 14px;
   overflow-x: auto;
+  box-shadow: var(--rp-shadow);
+}
+#preview pre::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(90deg, var(--rp-accent-1-d), var(--rp-accent-2-d) 70%);
 }
 #preview pre code {
   background: none;
   padding: 0;
+  color: inherit;
 }
 
-/* テーブル罫線（既定 #999999、カスタマイズ可能） */
+/* テーブルの装飾（角丸・影・ヘッダー塗り分け・縞模様。罫線色はカスタマイズ可能） */
 #preview table {
-  border-collapse: collapse;
-  margin: 0.8em 0;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1em 0;
+  border: 1px solid var(--c-table-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--rp-shadow);
 }
 #preview th, #preview td {
-  border: 1px solid var(--c-table-border);
-  padding: 5px 12px;
+  border-bottom: 1px solid var(--c-table-border);
+  padding: 7px 14px;
+  text-align: left;
 }
-#preview th { background: var(--code-bg); }
+#preview th { background: var(--rp-table-header-bg); font-weight: 700; }
+#preview tbody tr:last-child td { border-bottom: none; }
+#preview tbody tr:nth-child(even) { background: var(--rp-table-stripe); }
 
 #preview hr {
   border: none;
@@ -538,8 +652,8 @@ body {
   .tab-chip { max-width: 130px; }
   .tab-select { max-width: 80px; }
 
-  /* 編集/プレビュー切替タブと役割が重複するため、この専用トグルは隠す */
-  #btn-toggle-preview { display: none; }
+  /* 編集/プレビュー切替タブと役割が重複するため、この専用コントロールは隠す */
+  .view-mode-group { display: none; }
 
   #view-switch { display: flex; }
 

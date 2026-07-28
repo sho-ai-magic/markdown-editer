@@ -23,6 +23,7 @@ initSettings({
 const cm = createEditor($("editor-host"));
 const previewPane = $("preview-pane");
 const previewEl = $("preview");
+const previewMetaEl = $("preview-meta");
 
 const scrollSync = initScrollSync(cm, previewPane);
 
@@ -52,10 +53,22 @@ viewSwitchEl.querySelectorAll(".view-tab").forEach((btn) => {
 });
 
 // リアルタイムプレビュー（200msデバウンス、仕様書3.2）
+function updatePreviewMeta() {
+  const charCount = (previewEl.textContent || "").replace(/\s+/g, "").length;
+  if (charCount === 0) {
+    previewMetaEl.hidden = true;
+    return;
+  }
+  const minutes = Math.max(1, Math.round(charCount / 600));
+  previewMetaEl.hidden = false;
+  previewMetaEl.textContent = `${charCount.toLocaleString()}文字 ・ 約${minutes}分で読めます`;
+}
+
 function render() {
   const { html, headings } = renderMarkdown(cm.getValue());
   previewEl.innerHTML = html;
   toc.update(headings);
+  updatePreviewMeta();
 }
 const renderDebounced = debounce(render, 200);
 cm.on("change", renderDebounced);
@@ -67,14 +80,22 @@ const toolbarActions = initToolbar({
   charCountEl: $("char-count"),
   copyMdBtn: $("btn-copy-md"),
   copyRichBtn: $("btn-copy-rich"),
-  richHtmlBtn: $("btn-rich-html"),
   previewEl,
 });
 
-// ---- プレビューの表示/非表示（デスクトップ向け。モバイルは編集/プレビュー
-// 切替タブが同じ役割を果たすため、このボタン自体をCSSで非表示にしている） ----
-$("btn-toggle-preview").addEventListener("click", () => {
-  mainEl.classList.toggle("preview-closed");
+// ---- エディタ/プレビューの表示モード（デスクトップ向け。モバイルは編集/
+// プレビュー切替タブが同じ役割を果たすため、このグループ自体をCSSで非表示に
+// している）。「エディタのみ」「分割」「プレビューのみ」の排他的な3状態 ----
+const viewModeGroupEl = $("view-mode-group");
+viewModeGroupEl.querySelectorAll(".view-mode-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    mainEl.classList.remove("preview-closed", "editor-closed");
+    if (btn.dataset.mode === "editor") mainEl.classList.add("preview-closed");
+    else if (btn.dataset.mode === "preview") mainEl.classList.add("editor-closed");
+    viewModeGroupEl.querySelectorAll(".view-mode-btn").forEach((b) => {
+      b.classList.toggle("active", b === btn);
+    });
+  });
 });
 
 // ---- タブ（複数ファイルの同時編集） ----
