@@ -11,6 +11,8 @@ Write Markdown on the left and see it rendered instantly on the right. A formatt
 ## Features
 
 - **Tabs**: open and edit several Markdown files at once, switching between them freely
+- **File explorer**: switch the sidebar from the table of contents to a folder tree and click any Markdown file inside to open it in a new tab (Chrome/Edge only)
+- **Save version history**: every save records a snapshot of the previous content, restorable with one click from the "History" button (kept in memory for this tab and this session only)
 - **Split-pane editing with live preview** (including pipe tables)
 - **Formatting toolbar**: bold, italic, strikethrough, headings, bullet/numbered lists, task lists, blockquotes, code, tables, and links — all one click away
 - **Lightweight syntax highlighting** for headings, lists, quotes, and code (colors are customizable)
@@ -58,12 +60,16 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 | Table / Link | Each has its own button (link inserts with the URL portion pre-selected for quick editing) |
 | Copy Markdown source | "Copy" button |
 | Copy as rich text | "Rich text" button (pastes with headings/bold intact into Google Docs, etc.) |
+| Restore a previous saved version | "History" button (recorded on every save; a restore only updates the editor, save again to write it to disk) |
+| Open a file from a folder | Switch the sidebar to "Files" → "Open Folder" → click a file in the tree (Chrome/Edge only) |
 | Toggle table of contents | Hamburger menu button |
 | Switch editor/preview layout | The three buttons on the right of the toolbar (editor-only / split / preview-only; hidden on mobile, where the editor/preview tabs already do this) |
 | Customize colors | "Settings" button — covers heading/list colors as well as the preview's accent colors ("Reset to defaults" restores the originals) |
 | Toggle theme | Sun/moon icon button |
 
 An unsaved-changes dot (●) appears next to a tab's name, and closing that tab — or closing the app — with unsaved changes prompts a confirmation dialog.
+
+Both the folder opened in the file explorer and the save version history are lost when you reload the app — like tab state, they're only kept in memory for the current session.
 
 The "N characters / ~M tokens" indicator in the toolbar is a rough guide for pasting into AI chat tools. It isn't a real tokenizer — it estimates using "1 character ≈ 1 token" for full-width characters (e.g. Japanese) and "4 characters ≈ 1 token" for ASCII text, so actual token counts will vary.
 

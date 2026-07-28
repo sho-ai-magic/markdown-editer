@@ -10,6 +10,9 @@
 // 再描画・文字数カウンター・スクロール同期は呼び出し側の onActivate で
 // 明示的に行う必要がある。
 
+// タブごとの保存バージョン履歴の上限（セッション内のみメモリ保持。古いものから破棄）
+const MAX_VERSIONS = 20;
+
 export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
   const tabs = [];
   let activeId = null;
@@ -107,7 +110,7 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
     const doc = new CodeMirror.Doc(text, "mdlite");
     const id = ++idCounter;
     const cleanGen = doc.changeGeneration(true);
-    tabs.push({ id, doc, fileName, fileHandle, cleanGen, scrollTop: 0, scrollLeft: 0 });
+    tabs.push({ id, doc, fileName, fileHandle, cleanGen, scrollTop: 0, scrollLeft: 0, versions: [] });
     activate(id);
     return id;
   }
@@ -154,11 +157,34 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
     if (fileHandle) tab.fileHandle = fileHandle;
     if (fileName) tab.fileName = fileName;
     tab.cleanGen = tab.doc.changeGeneration(true);
+    tab.versions.push({ content: tab.doc.getValue(), savedAt: Date.now() });
+    if (tab.versions.length > MAX_VERSIONS) tab.versions.shift();
     renderTabBar();
   }
 
   function hasUnsavedChanges() {
     return tabs.some((t) => !t.doc.isClean(t.cleanGen));
+  }
+
+  // アクティブなタブの保存履歴を新しい順で返す
+  function getVersions() {
+    const tab = getActive();
+    return tab ? tab.versions.slice().reverse() : [];
+  }
+
+  // 指定バージョンの内容をエディタ全文と置き換える（undo履歴を保つ形で）。
+  // ディスクへの反映には改めて保存操作が必要（通常の編集と同じ未保存扱いになる）。
+  function restoreVersion(version) {
+    if (!getActive()) return;
+    cm.operation(() => {
+      const lastLine = cm.lastLine();
+      cm.replaceRange(
+        version.content,
+        { line: 0, ch: 0 },
+        { line: lastLine, ch: cm.getLine(lastLine).length }
+      );
+    });
+    cm.focus();
   }
 
   cm.on("change", updateActiveDirtyDot);
@@ -171,5 +197,7 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate }) {
     getActive,
     markActiveSaved,
     hasUnsavedChanges,
+    getVersions,
+    restoreVersion,
   };
 }

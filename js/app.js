@@ -6,6 +6,7 @@ import { initFiles } from "./files.js";
 import { initSettings } from "./settings.js";
 import { initToolbar } from "./toolbar.js";
 import { initTabs } from "./tabs.js";
+import { initExplorer } from "./explorer.js";
 
 const $ = (id) => document.getElementById(id);
 
@@ -36,6 +37,18 @@ const toc = initToc({
   toggleBtn: $("btn-toc"),
   backdropEl: $("toc-backdrop"),
   scrollSync,
+});
+
+// ---- 目次⇄ファイルエクスプローラーのパネル切り替え ----
+const tocSectionEl = $("toc-section");
+const explorerSectionEl = $("explorer-section");
+document.querySelectorAll(".toc-panel-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const isExplorer = btn.dataset.panel === "explorer";
+    tocSectionEl.hidden = isExplorer;
+    explorerSectionEl.hidden = !isExplorer;
+    document.querySelectorAll(".toc-panel-btn").forEach((b) => b.classList.toggle("active", b === btn));
+  });
 });
 
 // ---- 編集/プレビュー切替タブ（モバイルのみ表示） ----
@@ -109,7 +122,17 @@ const tabs = initTabs({
     render();
     toolbarActions.refreshCharCount();
     scrollSync.syncNow();
+    historyPanel.hidden = true;
   },
+});
+
+// ---- ファイルエクスプローラー（目次パネル内、フォルダを開いてMarkdown
+// ファイルを新規タブとして開く。File System Access API対応ブラウザのみ） ----
+initExplorer({
+  treeEl: $("explorer-tree"),
+  openFolderBtn: $("btn-open-folder"),
+  emptyStateEl: $("explorer-empty"),
+  tabs,
 });
 
 // ---- ファイル操作 ----
@@ -141,6 +164,63 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
     toolbarActions.italic();
   }
+});
+
+// ---- 保存バージョン履歴（アクティブなタブ・このセッションのみメモリ保持） ----
+const historyBtn = $("btn-history");
+const historyPanel = $("history-panel");
+const historyListEl = $("history-list");
+
+function renderHistory() {
+  historyListEl.textContent = "";
+  const versions = tabs.getVersions();
+  if (versions.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "history-empty";
+    empty.textContent = "このタブの保存履歴はまだありません";
+    historyListEl.appendChild(empty);
+    return;
+  }
+  versions.forEach((v) => {
+    const row = document.createElement("div");
+    row.className = "history-item";
+
+    const time = document.createElement("time");
+    time.textContent = new Date(v.savedAt).toLocaleString("ja-JP", {
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    row.appendChild(time);
+
+    const restoreBtn = document.createElement("button");
+    restoreBtn.type = "button";
+    restoreBtn.textContent = "復元";
+    restoreBtn.addEventListener("click", () => {
+      tabs.restoreVersion(v);
+      historyPanel.hidden = true;
+    });
+    row.appendChild(restoreBtn);
+
+    historyListEl.appendChild(row);
+  });
+}
+
+historyBtn.addEventListener("mousedown", (e) => e.preventDefault());
+historyBtn.addEventListener("click", () => {
+  const willOpen = historyPanel.hidden;
+  if (willOpen) renderHistory();
+  historyPanel.hidden = !willOpen;
+});
+document.addEventListener("click", (e) => {
+  if (historyPanel.hidden) return;
+  if (historyPanel.contains(e.target) || historyBtn.contains(e.target)) return;
+  historyPanel.hidden = true;
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !historyPanel.hidden) historyPanel.hidden = true;
 });
 
 // ---- 初期コンテンツ（初回起動時の簡単な使い方） ----
