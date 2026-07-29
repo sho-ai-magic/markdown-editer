@@ -1,6 +1,6 @@
 // オフライン動作用のService Worker。アプリ一式を事前キャッシュする。
 // アプリのファイルを更新したら CACHE_VERSION を上げること。
-const CACHE_VERSION = "mdeditor-v12";
+const CACHE_VERSION = "mdeditor-v14";
 
 const ASSETS = [
   "./",
@@ -26,8 +26,12 @@ const ASSETS = [
   "./vendor/codemirror/searchcursor.js",
   "./vendor/markdown-it.min.js",
   "./manifest.webmanifest",
+  "./icons/favicon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png",
+  "./icons/maskable-icon-192.png",
+  "./icons/maskable-icon-512.png",
 ];
 
 self.addEventListener("install", (e) => {
