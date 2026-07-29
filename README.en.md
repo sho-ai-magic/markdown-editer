@@ -58,8 +58,8 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 | Save | "Save" / Ctrl+S (applies to the active tab) |
 | Save As | "Save As" / Ctrl+Shift+S (applies to the active tab) |
 | Auto-save | Turn on "Auto-save" in Settings (saves 3 seconds after you stop typing, for tabs with a save location) |
-| Find / Replace | Ctrl+F / Ctrl+H |
-| Print / save as PDF | Ctrl+P (prints only the preview content) |
+| Find / Replace | The magnifier buttons on the formatting toolbar, or Ctrl+F / Ctrl+H |
+| Print / save as PDF | "Print" button / Ctrl+P (prints only the preview content) |
 | Resize panes | Drag the borders between the sidebar, editor, and preview |
 | Editor font size / line height | "Settings" → "Editor" section |
 | Bold / Italic | **B** / *I* buttons above the editor, or Ctrl+B / Ctrl+I |
@@ -71,7 +71,8 @@ From then on, double-clicking a `.md` file opens it in this editor (works with t
 | Copy as rich text | "Rich text" button (pastes with headings/bold intact into Google Docs, etc.) |
 | Restore a previous saved version | "History" button (recorded on every save; a restore only updates the editor, save again to write it to disk) |
 | Open a file from a folder | Switch the sidebar to "Files" → "Open Folder" → click a file in the tree (Chrome/Edge only) |
-| Toggle table of contents | Hamburger menu button |
+| Toggle the sidebar (contents / files) | "Sidebar" button |
+| Undo / Redo | The arrow buttons on the formatting toolbar, or Ctrl+Z / Ctrl+Y |
 | Switch editor/preview layout | The three buttons on the right of the toolbar (editor-only / split / preview-only; hidden on mobile, where the editor/preview tabs already do this) |
 | Customize colors | "Settings" button — covers heading/list colors as well as the preview's accent colors ("Reset to defaults" restores the originals) |
 | Toggle theme | Sun/moon icon button |

@@ -167,6 +167,8 @@ const files = initFiles({
 $("btn-open").addEventListener("click", () => files.openFile());
 $("btn-save").addEventListener("click", () => files.saveFile());
 $("btn-save-as").addEventListener("click", () => files.saveFileAs());
+// 印刷（@media printでプレビューのみが印刷される。PDF保存にも利用可能）
+$("btn-print").addEventListener("click", () => window.print());
 
 // ---- 自動保存（設定で有効化。入力が止まって3秒後に上書き保存） ----
 // ファイルハンドルを持つタブのみ対象（白紙タブで保存ダイアログが勝手に

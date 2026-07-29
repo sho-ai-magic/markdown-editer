@@ -13,9 +13,9 @@
 </head>
 <body>
 <header id="toolbar">
-  <button id="btn-toc" class="tool-btn" title="目次の表示/非表示">
+  <button id="btn-toc" class="tool-btn" title="サイドバー（目次・ファイル）の表示/非表示">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
-    <span class="btn-label">目次</span>
+    <span class="btn-label">サイドバー</span>
   </button>
   <span class="spacer"></span>
   <button id="btn-open" class="tool-btn" title="ファイルを開く (Ctrl+O)">
@@ -30,7 +30,11 @@
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h8l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M8 3v4h5V3"/><rect x="7" y="12" width="6" height="8"/><path d="M16.5 15.5l2 2L22 14l-2-2z"/></svg>
     <span class="btn-label">名前を付けて保存</span>
   </button>
-  <button id="btn-settings" class="tool-btn" title="色の設定">
+  <button id="btn-print" class="tool-btn" title="印刷 / PDF保存 (Ctrl+P)。プレビューの内容だけが印刷されます">
+    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5"/><path d="M5 8h14a2 2 0 0 1 2 2v6h-4v-3H7v3H3v-6a2 2 0 0 1 2-2z"/><rect x="7" y="16" width="10" height="5"/></svg>
+    <span class="btn-label">印刷</span>
+  </button>
+  <button id="btn-settings" class="tool-btn" title="設定">
     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
       <circle cx="12" cy="12" r="7.2"/>
       <circle cx="12" cy="12" r="3"/>
@@ -107,6 +111,13 @@
   <div id="splitter-toc" class="splitter" title="ドラッグで目次の幅を調整"></div>
   <section id="editor-pane" aria-label="編集画面">
     <div id="format-toolbar" role="toolbar" aria-label="書式ツールバー">
+      <button class="fmt-btn" data-fmt="undo" title="元に戻す (Ctrl+Z)" aria-label="元に戻す">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5L3 10l5 5"/><path d="M3 10h11a6 6 0 0 1 6 6v3"/></svg>
+      </button>
+      <button class="fmt-btn" data-fmt="redo" title="やり直し (Ctrl+Y)" aria-label="やり直し">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5l5 5-5 5"/><path d="M21 10H10a6 6 0 0 0-6 6v3"/></svg>
+      </button>
+      <span class="fmt-sep"></span>
       <button class="fmt-btn" data-fmt="bold" title="太字 (Ctrl+B)"><b>B</b></button>
       <button class="fmt-btn" data-fmt="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
       <button class="fmt-btn" data-fmt="strike" title="取り消し線"><s>S</s></button>
@@ -150,6 +161,13 @@
       </button>
       <button class="fmt-btn" data-fmt="link" title="リンク" aria-label="リンク">
         <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 14.5l5-5"/><path d="M8 16.5A3.5 3.5 0 0 1 8 9l2-2"/><path d="M16 7.5A3.5 3.5 0 0 1 16 15l-2 2"/></svg>
+      </button>
+      <span class="fmt-sep"></span>
+      <button class="fmt-btn" data-fmt="find" title="検索 (Ctrl+F)" aria-label="検索">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l6 6"/></svg>
+      </button>
+      <button class="fmt-btn" data-fmt="replace" title="置換 (Ctrl+H)" aria-label="置換">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.5" cy="9.5" r="5.5"/><path d="M13.5 13.5l3 3"/><path d="M14 19.5h7"/><path d="M18.5 17l2.5 2.5L18.5 22"/></svg>
       </button>
       <span class="spacer"></span>
       <span id="char-count" title="文字数と、AIチャット等に貼り付ける際の目安トークン数（概算値）">0文字 / 約0トークン</span>

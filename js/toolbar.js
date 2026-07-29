@@ -207,6 +207,12 @@ async function copyRichText(cm, previewEl, btn) {
 
 export function initToolbar({ cm, toolbarEl, charCountEl, copyMdBtn, copyRichBtn, previewEl }) {
   const actions = {
+    undo: () => { cm.undo(); cm.focus(); },
+    redo: () => { cm.redo(); cm.focus(); },
+    // 検索/置換はvendor同梱のCodeMirror検索アドオンのコマンドを呼ぶ
+    // （Ctrl+F / Ctrl+H と同じダイアログが開く）
+    find: () => cm.execCommand("find"),
+    replace: () => cm.execCommand("replace"),
     bold: () => wrapInline(cm, "**"),
     italic: () => wrapInline(cm, "*"),
     strike: () => wrapInline(cm, "~~"),
