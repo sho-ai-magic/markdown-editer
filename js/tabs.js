@@ -66,7 +66,7 @@ export function initTabs({ cm, tabBarEl, newTabBtn, onActivate, onTabBarRender }
       closeBtn.className = "tab-close";
       closeBtn.title = "タブを閉じる";
       closeBtn.innerHTML =
-        '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        '<svg class="icon" viewBox="0 -960 960 960" aria-hidden="true"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg>';
       closeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         closeTab(t.id);

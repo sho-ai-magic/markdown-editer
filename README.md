@@ -111,6 +111,7 @@ python3 -m http.server 8000
 - ビルドステップなしの静的Webアプリ（Vanilla JS）。`index.html` をHTTPで配信すればそのまま動く
 - エディタ部品: [CodeMirror 5](https://codemirror.net/5/)（MITライセンス、`vendor/` に同梱）。日本語IMEとの相性が良く、ビルド不要で組み込める
 - Markdown変換: [markdown-it](https://github.com/markdown-it/markdown-it)（MITライセンス、`vendor/` に同梱）
+- アイコン: [Material Symbols](https://fonts.google.com/icons)（Apache License 2.0）のSVGパスデータを抜き出してインライン埋め込み。Google Fontsへの外部リクエストは発生しない
 - オフライン対応: Service Worker（`sw.js`）。**アプリのファイルを更新したら `sw.js` の `CACHE_VERSION` を上げること**
 - ファイルの読み書きにはFile System Access APIを使用（Chrome/Edge系ブラウザで上書き保存に対応。未対応ブラウザはダウンロード形式にフォールバック）
 

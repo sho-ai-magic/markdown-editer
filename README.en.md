@@ -111,6 +111,7 @@ python3 -m http.server 8000
 - A build-free static web app (vanilla JS). Serve `index.html` over HTTP and it just works
 - Editor: [CodeMirror 5](https://codemirror.net/5/) (MIT licensed, vendored under `vendor/`) — chosen for solid IME support and zero build requirements
 - Markdown rendering: [markdown-it](https://github.com/markdown-it/markdown-it) (MIT licensed, vendored under `vendor/`)
+- Icons: [Material Symbols](https://fonts.google.com/icons) (Apache License 2.0) — SVG path data inlined directly, no runtime requests to Google Fonts
 - Offline support via a Service Worker (`sw.js`) — bump `CACHE_VERSION` in that file whenever you update the app's assets
 - File I/O uses the File System Access API for in-place saves on Chromium browsers, with a download-based fallback elsewhere
 

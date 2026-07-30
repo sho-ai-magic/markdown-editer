@@ -108,11 +108,8 @@ body {
   height: 18px;
   display: block;
   flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 
 /* テーマ切替ボタン: 太陽/月の2アイコンをテーマ属性でCSS切り替え */
@@ -145,11 +142,8 @@ body {
 .view-mode-btn .icon {
   width: 16px;
   height: 16px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 .view-mode-btn:hover { color: var(--link); }
 .view-mode-btn.active { background: var(--link); color: #fff; }
@@ -194,11 +188,8 @@ body {
 .tab-scroll .icon {
   width: 14px;
   height: 14px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 
 .tab-chip {
@@ -256,11 +247,8 @@ body {
 .tab-close .icon, .tab-new .icon {
   width: 14px;
   height: 14px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 .tab-new { margin: 4px 6px; }
 
@@ -375,11 +363,8 @@ body {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 
 .explorer-empty {
@@ -415,11 +400,8 @@ body {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 .explorer-chevron {
   width: 14px !important;
@@ -967,11 +949,8 @@ body.splitter-dragging { user-select: none; cursor: col-resize; }
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor;
+  stroke: none;
 }
 .view-tab.active {
   background: var(--link);
