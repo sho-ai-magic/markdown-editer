@@ -30,6 +30,8 @@ const ASSETS = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png",
+  "./icons/maskable-icon-192.png",
+  "./icons/maskable-icon-512.png",
 ];
 
 self.addEventListener("install", (e) => {
